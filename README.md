@@ -29,4 +29,4 @@ For every identified trend, the system retrieves data from:
 ## Setup and Installation
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/prateekshadevi/google_trends_forecaster_rag.git](https://github.com/prateekshadevi/google_trends_forecaster_rag.git)
+   git clone [https://github.com/prateekshadevi/CATS---Context-Aware-Trend-Sentiment-system.git](https://github.com/prateekshadevi/CATS---Context-Aware-Trend-Sentiment-system.git)
