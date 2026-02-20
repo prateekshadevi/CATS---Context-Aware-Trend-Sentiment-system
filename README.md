@@ -1,4 +1,5 @@
-# Context-Aware Social Media Trend Prediction and Sentiment Analysis Using LLM-RAG
+# CATS (Context-Aware Trend Sentiment system)
+## Context-Aware Social Media Trend Prediction and Sentiment Analysis Using LLM-RAG
 
 ## Project Overview
 This capstone project develops a Retrieval-Augmented Generation (RAG) system designed to identify emerging search trends and synthesize a 360-degree context from news, social media, and technical discourse. The system aims to provide high-fidelity summaries and sentiment analysis by grounding Large Language Models (LLMs) in real-time, multi-platform data.
