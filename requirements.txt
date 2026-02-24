@@ -1,0 +1,37 @@
+# --- API Clients & Web Scraping ---
+newsapi-python
+feedparser
+requests
+beautifulsoup4
+wikipedia-api
+pytrends
+
+# --- Data Processing ---
+pandas
+numpy
+python-dotenv
+
+# --- Development Utilities ---
+datetime
+
+# --- Embedding Model ---
+transformers==4.41.2
+tokenizers==0.19.1
+huggingface-hub==0.24.7
+sentence-transformers==3.0.1
+accelerate==0.33.0
+
+# --- Vector Database ---
+chromadb
+
+# --- NLP & Text Processing ---
+langchain-text-splitters
+
+# --- Visualization ---
+plotly
+
+# --- Progress Bar ---
+tqdm
+
+# --- Protobuf (pinned to avoid conflicts with mediapipe/tensorflow) ---
+protobuf==3.20.3
