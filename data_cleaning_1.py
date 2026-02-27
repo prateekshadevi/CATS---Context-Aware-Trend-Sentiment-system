@@ -428,9 +428,9 @@ class SocialActionCleaner(BaseCleaner):
     
     def _compile_patterns(self):
         self.patterns = [
-            re.compile(r'\b(share|like|comment|reply|retweet|quote tweet)\b', re.IGNORECASE),
+            re.compile(r'\b(share|comment|reply|retweet|quote tweet)\b', re.IGNORECASE),
             re.compile(r'\b(follow|subscribe|unfollow|unsubscribe)\b', re.IGNORECASE),
-            re.compile(r'\b(upvote|downvote|vote)\b', re.IGNORECASE),
+            re.compile(r'\b(downvote|vote)\b', re.IGNORECASE),
             re.compile(r'\b(bookmark|save|flag)\b', re.IGNORECASE),
         ]
     
@@ -1740,10 +1740,10 @@ class ExcessivePunctuationCleaner(BaseCleaner):
     
     def _compile_patterns(self):
         self.patterns = [
-            (re.compile(r'!{2,}'), '!'),
-            (re.compile(r'\?{2,}'), '?'),
+            (re.compile(r'!{4,}'), '!'),
+            (re.compile(r'\?{3,}'), '?'),
             (re.compile(r'\.{4,}'), '...'),
-            (re.compile(r'!+\?+|[\?!]{3,}'), '?!'),
+            (re.compile(r'!+\?+|[\?!]{5,}'), '?!'),
         ]
     
     def clean(self, text: str) -> str:
