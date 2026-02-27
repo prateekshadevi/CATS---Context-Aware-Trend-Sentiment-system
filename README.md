@@ -10,7 +10,7 @@ This iteration establishes the foundational dataset schema and the multi-source 
 ### 1. Trend Discovery (The Seed)
 Unlike static datasets, this project utilizes a dynamic seeding process:
 * **Source:** Google Trends (Real-Time Search Data).
-* **Methodology:** Manual export of the **"Past 4 Hours"** breakout trends in CSV format.
+* **Methodology:** Manual export of the **"Past 24 Hours"** breakout trends in CSV format.
 * **Rationale:** This high-granularity window captures "Breakout" topics (surges > 5,000%) as they unfold, ensuring the downstream data collection is synchronized with peak public interest.
 
 ### 2. Multi-Platform Contextual Sources
