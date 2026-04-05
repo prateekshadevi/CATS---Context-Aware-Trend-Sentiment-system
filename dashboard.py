@@ -1,134 +1,92 @@
 import streamlit as st
 import pandas as pd
 import os
+import getpass
 
-import streamlit as st
+# 1. SETUP & THEME
+st.set_page_config(page_title="CATS Intelligence Feed", layout="wide")
+st.markdown("""<style>
+.main { background-color: #0E1117; color: #FFFFFF; }
+[data-testid="stSidebar"] { background-color: #161B22; border-right: 1px solid #30363D; }
+.stExpander { border: 1px solid #30363D !important; background-color: #1E1E1E !important; }
+</style>""", unsafe_allow_html=True)
 
-st.set_page_config(page_title="CATS Analytics", layout="wide")
+# 2. DATA LOADING
+user = getpass.getuser()
+SCRATCH_PATH = f'/scratch/{user}/'
 
-# This CSS forces the metric labels and values to be readable
-st.markdown("""
-    <style>
-    /* Main Metric Box Styling */
-    [data-testid="stMetric"] {
-        background-color: #1E1E1E !important; /* Deep charcoal background */
-        border: 1px solid #3E3E3E !important; /* Subtle border */
-        border-left: 5px solid #00FFAA !important; /* Cool Neon Green accent border */
-        padding: 15px !important;
-        border-radius: 8px !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
-    }
+@st.cache_data
+def load_data():
+    master_df = pd.read_csv(os.path.join(SCRATCH_PATH, 'cats_master_dashboard_data.csv'))
+    predict_df = pd.read_csv(os.path.join(SCRATCH_PATH, 'cats_predicted_top10.csv'))
+    return master_df, predict_df
 
-    /* Metric Value (The Big Numbers) */
-    [data-testid="stMetricValue"] {
-        color: #00FFAA !important; /* Neon Green for numbers */
-        font-family: 'Courier New', monospace !important;
-    }
+try:
+    df, df_pred = load_data()
+except Exception as e:
+    st.error(f"Waiting for CSV files in {SCRATCH_PATH}...")
+    st.stop()
 
-    /* Metric Label (The Text Above) */
-    [data-testid="stMetricLabel"] {
-        color: #AAAAAA !important; /* Soft grey for labels */
-        font-weight: bold !important;
-        text-transform: uppercase !important;
-        letter-spacing: 1px !important;
-    }
-    
-    /* Make sure the main app background stays dark */
-    .main {
-        background-color: #0E1117;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+# 3. HEADER
+st.title("🗠 CATS: Context-Aware Trend Sentiment")
+st.caption(f"🚀 **System Dashboard**")
+st.divider()
 
-# dynamic user path
-user = os.environ.get("USER")
-SCRATCH_CSV = f"/scratch/{user}/cats_master_dashboard_data.csv"
-st.set_page_config(page_title="CATS Intelligence Command", layout="wide", page_icon="🐱")
+# 4. SIDEBAR
+st.sidebar.title("📡 System Control")
+min_integrity = st.sidebar.slider("Minimum Scientific Integrity", 0.0, 1.0, 0.4, 0.05)
 
+# 5. TABS
+tab1, tab2 = st.tabs(["🎯 Today's Intelligence Feed", "🔮 Horizon Forecast"])
 
-
-# Professional Styling
-
-st.markdown("""
-    <style>
-    .main { background-color: #f8f9fa; }
-    .stMetric { background-color: #ffffff; border-radius: 10px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    </style>
-    """, unsafe_allow_html=True)
-
-st.title("🐱 CATS: Context-Aware Trend Sentiment")
-st.caption("2026 Social Media Intelligence & Scientific Audit Dashboard")
-
-if not os.path.exists(SCRATCH_CSV):
-    st.error("⚠️ Dashboard data not found. Run the integration step in CATS.ipynb.")
-else:
-    df = pd.read_csv(SCRATCH_CSV)
-
-    # --- SIDEBAR: CONTROLS ---
-    st.sidebar.header("🛡️ Audit Filters")
-    search_query = st.sidebar.text_input("🔍 Search Topic", "")
-    min_integrity = st.sidebar.slider("Min System Integrity", 0.0, 1.0, 0.40)
-    selected_sent = st.sidebar.multiselect("Sentiment Filter", 
-                                           df['Display Label'].unique(), 
-                                           default=df['Display Label'].unique())
-
-    # Apply Filtering
-    mask = (df['system_integrity'] >= min_integrity) & \
-           (df['Display Label'].isin(selected_sent))
-
-    if search_query:
-        mask = mask & (df['topic'].str.contains(search_query, case=False))
-    f_df = df[mask]
-
-
-
-    # --- TOP LEVEL METRICS (THE TRAFFIC LIGHTS) ---
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Trends", len(df))
-    grounded = len(df[df['audit_flag'].str.contains('Grounded', na=False)])
-    m2.metric("Grounded ✅", f"{grounded}", f"{grounded/len(df):.0%} reliable")
-    m3.metric("Avg Integrity ⚖️", f"{df['system_integrity'].mean():.2f}")
-    m4.metric("Avg Conf 🎯", f"{df['confidence'].mean():.2%}")
-    st.divider()
-
-    # --- THE TREND FEED ---
-    if f_df.empty:
-        st.warning("No trends match your current Audit filters.")
-
+with tab1:
+    filtered_df = df[df['system_integrity'] >= min_integrity]
+    if filtered_df.empty:
+        st.warning(f"No trends meet the Integrity threshold of {min_integrity}")
     else:
-        for _, row in f_df.iterrows():
-            with st.expander(f"📌 {row['topic'].upper()} | {row['Display Label']}", expanded=True):
-                # Create Tabs for a cleaner look
-                tab_summary, tab_audit = st.tabs(["💡 Intelligence Summary", "🔬 Scientific Audit"])
+        for _, row in filtered_df.iterrows():
+            # Formatting logic
+            disp_label = str(row.get('Display Label', '⚪ Neutral'))
+            topic_name = str(row['topic']).upper()
+            integrity_val = max(0.0, min(float(row.get('system_integrity', 0)), 1.0))
 
-                with tab_summary:
-                    col_text, col_stats = st.columns([2, 1])
+            with st.expander(f"📌 {topic_name} | {disp_label}"):
+                col_text, col_metrics = st.columns([2, 1.2])
+                with col_text:
+                    st.markdown("### 💡 Intelligence Summary")
+                    st.write(row['generated_summary'])
+                    st.caption(f"📂 **Sources:** {row.get('sources_used', 'N/A')} | 🧩 **Chunks:** {row.get('chunks_used', 'N/A')}")
+                with col_metrics:
+                    st.markdown("### 🔬 Scientific Audit")
+                    m1, m2 = st.columns(2)
+                    m1.metric("SBERT", f"{row.get('sbert_vs_context', 0):.2f}")
+                    m2.metric("Faithfulness", f"{row.get('faithfulness', 0):.2f}")
+                    st.progress(integrity_val, text=f"System Integrity: {integrity_val:.2f}")
+                    st.divider()
+                    m3, m4 = st.columns(2)
+                    m3.metric("Survival", f"{row.get('survival_chance_pct', 0)}%")
+                    m4.write(f"**Velocity:**\n{row.get('velocity', 'Stable')}")
+                st.success(f"**Forecast:** {row.get('prediction_label', 'Active Trend')}")
 
-                    with col_text:
-                        st.markdown("**AI Report:**")
-                        st.info(row['generated_summary'])
-
-                    with col_stats:
-                        st.markdown("**Social Pulse:**")
-                        st.write(f"📈 Velocity: `{row['velocity']}`")
-                        st.write(f"📡 Sources: `{row['sources_used']}`")
-                        st.write(f"🔍 Chunks: `{row['chunks_used']}`")
-
-                with tab_audit:
-                    a1, a2 = st.columns([1, 1])
-                    with a1:
-                        st.markdown("**Hallucination Check**")
-                        flag = str(row['audit_flag'])
-                        if "Grounded" in flag: st.success(f"STATUS: {flag}")
-                        elif "Borderline" in flag: st.warning(f"STATUS: {flag}")
-                        else: st.error(f"STATUS: {flag}")
-                        st.caption(f"System Integrity: {row['system_integrity']:.2f}")
-                        st.progress(float(row['system_integrity']))
-
-                    with a2:
-                        st.markdown("**Core Metrics**")
-
-                        # Show the specific metrics we added
-                        st.caption(f"SBERT Similarity: {row['sbert_vs_context']:.4f}")
-                        st.caption(f"RAG Faithfulness: {row['faithfulness']:.2f}")
-                        st.caption(f"Sentiment Conf: {row['confidence']:.2%}")
+with tab2:
+    st.header("🔮 Predicted Top 10 (Next 24h)")
+    st.write("Calculated based on social momentum, volume growth, and survival probability.")
+    # Add column_config to force the progress bar
+    st.dataframe(
+        df_pred[['predicted_rank', 'topic', 'survival_chance_pct', 'prediction_label', 'momentum_signal']], 
+        column_config={
+            "predicted_rank": "Rank",
+            "topic": "Trend Name",
+            "survival_chance_pct": st.column_config.ProgressColumn(
+                "Survival Chance",
+                help="Probability of this trend remaining in the Top 10 tomorrow",
+                format="%f%%",
+                min_value=0,
+                max_value=100,
+            ),
+            "prediction_label": "Class",
+            "momentum_signal": "Pulse"
+        },
+        hide_index=True, 
+        use_container_width=True
+    )
