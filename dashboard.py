@@ -73,7 +73,7 @@ with tab2:
     st.write("Calculated based on social momentum, volume growth, and survival probability.")
     # Add column_config to force the progress bar
     st.dataframe(
-        df_pred[['predicted_rank', 'topic', 'survival_chance_pct', 'prediction_label', 'momentum_signal']], 
+        df_pred[['predicted_rank', 'topic', 'survival_chance_pct', 'prediction_label', 'momentum_signal', 'seen_yesterday']], 
         column_config={
             "predicted_rank": "Rank",
             "topic": "Trend Name",
@@ -85,7 +85,8 @@ with tab2:
                 max_value=100,
             ),
             "prediction_label": "Class",
-            "momentum_signal": "Pulse"
+            "momentum_signal": "Pulse",
+            "seen_yesterday": "Seen Yesterday"
         },
         hide_index=True, 
         use_container_width=True
