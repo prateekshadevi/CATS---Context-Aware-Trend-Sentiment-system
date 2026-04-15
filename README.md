@@ -25,7 +25,7 @@ A dual-model pipeline that balances speed and reasoning:
 ### 4. XGBoost Trend Prediction
 A machine learning engine that forecasts trend trajectory using:
 * **Features:** Logarithmic velocity, maturity (duration), breakdown counts, and matchup detection.
-* **Output:** Identifies **Dark Horse** candidates—topics outside the Top 10 with high acceleration—and calculates survival probabilities for the next 24 hours.
+* **Output:** Identifies **Dark Horse** candidates, topics outside the Top 10 with high acceleration, and calculates survival probabilities for the next 24 hours.
 
 ## Repository Structure
 * `CATS.ipynb`: The primary end-to-end integration notebook containing the collection, RAG, sentiment, and prediction logic.
