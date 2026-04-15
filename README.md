@@ -2,31 +2,38 @@
 ## Context-Aware Social Media Trend Prediction and Sentiment Analysis Using LLM-RAG
 
 ## Project Overview
-This capstone project develops a Retrieval-Augmented Generation (RAG) system designed to identify emerging search trends and synthesize a 360-degree context from news, social media, and technical discourse. The system aims to provide high-fidelity summaries and sentiment analysis by grounding Large Language Models (LLMs) in real-time, multi-platform data.
+CATS is an automated intelligence pipeline designed to solve the *temporal gap* in traditional AI by grounding Large Language Models in real-time data. The system identifies emerging search trends and synthesizes a 360-degree context—spanning factual reporting, public emotion, and predictive momentum—to provide high-fidelity summaries and virality forecasts.
 
-## Iteration 3 Focus: Dataset Architecture & Selection
-This iteration establishes the foundational dataset schema and the multi-source ingestion pipeline. 
+## Core Architecture
 
-### 1. Trend Discovery (The Seed)
-Unlike static datasets, this project utilizes a dynamic seeding process:
-* **Source:** Google Trends (Real-Time Search Data).
-* **Methodology:** Manual export of the **"Past 24 Hours"** breakout trends in CSV format.
-* **Rationale:** This high-granularity window captures "Breakout" topics (surges > 5,000%) as they unfold, ensuring the downstream data collection is synchronized with peak public interest.
+### 1. Dynamic Seeding & Tiered Ingestion
+The system is initialized using **Google Trends** "Breakout" data (surges > 5,000%). 
+* **Tier 1 (Deep Context):** The Top 10 trends undergo full-text retrieval from NewsAPI, Wikipedia, Reddit, and Twitter (Bluesky) for RAG summarization and sentiment analysis.
+* **Tier 2 (Momentum):** The Top 100 trends are processed for engagement metadata (likes, reposts, timestamps) to feed the predictive model.
 
-### 2. Multi-Platform Contextual Sources
-For every identified trend, the system retrieves data from:
-* **NewsAPI:** Provides authoritative journalistic context and factual grounding.
-* **Reddit API:** Captures broad public sentiment and emotional discourse.
-* **Hacker News (Algolia API):** Acts as a technical sentiment proxy to filter hype from professional adoption.
-* **Wikipedia API:** Provides baseline entity definitions to prevent LLM hallucinations.
+### 2. The "Strict" RAG Pipeline
+To eliminate hallucination, CATS utilizes **Qwen 2.5 7B (Instruct-Quantized)** deployed locally on the Northeastern Discovery Cluster.
+* **Hybrid Retrieval:** Combines **BGE-M3** vector similarity with a *Keyword Lock* to ensure strict topical relevance.
+* **Scientific Auditor:** A custom secondary LLM layer that cross-references summaries against source chunks to produce *Faithfulness* and *Relevancy* scores.
+
+### 3. Hybrid Sentiment Analysis
+A dual-model pipeline that balances speed and reasoning:
+* **Primary:** `twitter-roberta-base-sentiment-latest` for high-speed inference.
+* **Escalation:** Ambiguous or sarcastic content (confidence < 0.65) is routed to Qwen 7B for deep linguistic reasoning.
+* **Weighting:** Final labels are weighted by **Engagement (Buzz)** and **Exponential Recency Decay**.
+
+### 4. XGBoost Trend Prediction
+A machine learning engine that forecasts trend trajectory using:
+* **Features:** Logarithmic velocity, maturity (duration), breakdown counts, and matchup detection.
+* **Output:** Identifies **Dark Horse** candidates—topics outside the Top 10 with high acceleration—and calculates survival probabilities for the next 24 hours.
 
 ## Repository Structure
-* `/data/raw/`: Contains the Google Trends CSV exports used for query seeding.
-* `data_dictionary.md`: Detailed definitions of the dataset schema and metadata.
-* `requirements.txt`: Python dependencies required for the collection pipeline.
-* `collector.py`: The core API integration logic for multi-source retrieval.
+* `CATS.ipynb`: The primary end-to-end integration notebook containing the collection, RAG, sentiment, and prediction logic.
+* `dashboard.py`: Streamlit-based interface for visualizing real-time intelligence feeds and trend momentum.
+* `/data/raw/`: Directory containing `trends_24.csv` and `trends_48.csv` used for model training and query seeding.
+* `chroma_db_top_10/`: Persistent vector store containing semantically filtered text chunks for the Tier 1 trends.
 
 ## Setup and Installation
-1. Clone the repository:
+1. **Clone the repository:**
    ```bash
    git clone [https://github.com/prateekshadevi/CATS---Context-Aware-Trend-Sentiment-system.git](https://github.com/prateekshadevi/CATS---Context-Aware-Trend-Sentiment-system.git)
