@@ -1,6 +1,13 @@
 # CATS (Context-Aware Trend Sentiment system)
 ## Context-Aware Social Media Trend Prediction and Sentiment Analysis Using LLM-RAG
 
+## 📺 Project Demonstration
+[![CATS System Demo](https://img.youtube.com/vi/oyFKBfuYrgo/maxresdefault.jpg)](https://youtu.be/oyFKBfuYrgo)
+
+*Click the image above to watch the full system walkthrough on YouTube, demonstrating our Tier 1 Deep RAG pipeline and Tier 2 Horizon Forecast.*
+
+---
+
 ## Project Overview
 CATS is an automated intelligence pipeline designed to solve the *temporal gap* in traditional AI by grounding Large Language Models in real-time data. The system identifies emerging search trends and synthesizes a 360-degree context—spanning factual reporting, public emotion, and predictive momentum—to provide high-fidelity summaries and virality forecasts.
 
